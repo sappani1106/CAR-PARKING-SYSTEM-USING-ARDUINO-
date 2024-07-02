@@ -1,0 +1,156 @@
+#include <Servo.h>
+
+#include <LiquidCrystal.h>
+const int rs = 0, en = 1, d4 = A1, d5 = A2, d6 = A3, d7 = A4;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+int parkingAvailable = 3; //car parking solt
+Servo s1; // servomotor 1
+Servo s2; // servomotor 2
+long duration; 
+int distanceCm1, distanceInch1;
+int distanceCm2, distanceInch2;
+int distanceCm3, distanceInch3;
+int distanceCm4, distanceInch4;
+int distanceCm5, distanceInch5;
+void setup() // declearing input and output pin for servo and ultrasonic sensor
+{
+  pinMode(3,INPUT);
+  pinMode(2,OUTPUT);
+  pinMode(5,INPUT);
+  pinMode(4,OUTPUT);
+  s1.attach(7);
+  s2.attach(6);
+  pinMode(9, OUTPUT);
+  pinMode(8, INPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, INPUT);
+  pinMode(12, OUTPUT);
+  pinMode(13, INPUT);
+  lcd.begin(16,2);
+  lcd.setCursor(0,0);
+  
+  
+}
+void loop()
+{
+  pinMode(2, OUTPUT); // gate from 1
+  digitalWrite(2,LOW);
+  delay(1);
+  digitalWrite(2,HIGH);
+  delay(10);
+  digitalWrite(2,LOW);
+  duration = pulseIn(3, HIGH);
+  distanceCm4= duration*0.034/2;
+  distanceInch4 = duration*0.0133/2;
+  Serial.println("Distance 4: ");
+  Serial.println(distanceCm4);
+  delay (100);
+  
+  if(distanceCm4<25)
+  {
+  	 s1.write(0);  
+  }else
+  {
+       s1.write(90);
+  }
+  pinMode(4, OUTPUT); // gate form 2
+  digitalWrite(4,LOW);
+  delay(1);
+  digitalWrite(4,HIGH);
+  delay(10);
+  digitalWrite(4,LOW);
+  duration = pulseIn(5, HIGH);
+  distanceCm5= duration*0.034/2;
+  distanceInch5 = duration*0.0133/2;
+  Serial.println("Distance 5: ");
+  Serial.println(distanceCm5);
+  delay (100);
+ 
+  if(distanceCm5<25)
+  {
+    s2.write(0);
+  }else
+  {
+    s2.write(90);
+
+  }
+  pinMode(9, OUTPUT); // slot 1
+  digitalWrite(9,LOW);
+  delay(1);
+  digitalWrite(9,HIGH);
+  delay(10);
+  digitalWrite(9,LOW);
+  duration = pulseIn(8, HIGH);
+  distanceCm1= duration*0.034/2;
+  distanceInch1 = duration*0.0133/2;
+  Serial.println("Distance 1: ");
+  Serial.println(distanceCm1);
+  delay (100);
+  pinMode(10, OUTPUT); // slot 2
+  digitalWrite(10,LOW);
+  delay(1);
+  digitalWrite(10,HIGH);
+  delay(10);
+  digitalWrite(10,LOW);
+  duration = pulseIn(11, HIGH);
+  distanceCm2= duration*0.034/2;
+  distanceInch2 = duration*0.0133/2;
+  Serial.println("Distance 2: ");
+  Serial.println(distanceCm2);
+  delay (100);
+  pinMode(12, OUTPUT); //solt 3
+  digitalWrite(12,LOW);
+  delay(1);
+  digitalWrite(12,HIGH);
+  delay(10);
+  digitalWrite(12,LOW);
+  duration = pulseIn(13, HIGH);
+  distanceCm3= duration*0.034/2;
+  distanceInch3 = duration*0.0133/2;
+  Serial.println("Distance 3: ");
+  Serial.println(distanceCm3);
+  delay (100);
+  lcd.setCursor(0,0);
+if (parkingAvailable == 0) //parking slot full or not 
+{
+  lcd.print("Parking Full");
+}
+else
+{
+  lcd.print("Total capacity ");
+  lcd.print(parkingAvailable);
+}  
+if (distanceCm1>100 && distanceCm2>100 && distanceCm3>100)
+{
+	lcd.setCursor(0,1);
+	lcd.print("Slot 1 2 3 Free");
+	delay(500);
+	}
+else if((distanceCm1>100 & distanceCm2>100)|(distanceCm2>100 & distanceCm3>100)|(distanceCm3>100 & distanceCm1>100))
+  {
+	lcd.setCursor(0,1);
+  	if(distanceCm1>100 & distanceCm2>100)
+		lcd.print("Slot 1 & 2 Free");
+  	else if(distanceCm1>100 & distanceCm3>100)
+		lcd.print("Slot 1 & 3 Free");
+  	else
+		lcd.print("Slot 2 & 3 Free");
+	}
+else if(distanceCm1<100 & distanceCm2<100 & distanceCm3<100)
+  {
+	lcd.setCursor(0,1);
+	lcd.print("Parking Full   ");
+	}
+else if((distanceCm1<100 & distanceCm2<100)|(distanceCm2<100 & distanceCm3<100)|(distanceCm3<100 & distanceCm1<100))
+  {
+	lcd.setCursor(0,1);
+  	if(distanceCm1>100)
+      lcd.print("Slot 1 is Free ");
+	else if (distanceCm2>100)
+       lcd.print("Slot 2 is Free ");
+    else
+       lcd.print("Slot 3 is Free ");
+   }
+  delay(100);
+}
